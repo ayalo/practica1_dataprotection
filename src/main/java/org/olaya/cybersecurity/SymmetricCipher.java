@@ -188,6 +188,7 @@ public class SymmetricCipher {
         int len_withpad = input.length; //- block_size - (input.length % block_size); //+ block_size - (input.length % block_size);// ej. 32 char mete bloque de mas si se ajusta al tamaño
         //int len_pad= block_size -(input.length % block_size); //5 char
         int from_pad=(input.length % block_size);
+        
         int total_blocks=len_withpad/block_size;
         byte [][] ec= new byte[total_blocks][block_size]; // array que va a contener los bloques sin encriptar
         System.out.println("len_withpad :"+len_withpad+"  len_pad="+len_pad+"  total_blocks="+total_blocks);

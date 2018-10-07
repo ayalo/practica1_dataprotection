@@ -24,24 +24,17 @@ public class App
         // Fichero que contiene el texto encriptado
         String ecoutput_path="/Users/olaya/IdeaProjects/practica1_dataprotection/ecoutput.txt";
 
-        System.out.println("  string plain text - input :  "+arrayByteToString(readFile(file_path)));
+        System.out.println("String plain text - input :  "+arrayByteToString(readFile(file_path)));
         //sc.readfile(file_path);
         byte[] encrypted_message= sc.encryptCBC(readFile(file_path), sc.iv);
 
-        System.out.println("  string text encripted "+Arrays.toString(encrypted_message));
+        System.out.println("String text encripted "+Arrays.toString(encrypted_message));
 
         writeFile(ecoutput_path,encrypted_message);
-        //System.out.println( "String encriptado: "+sc.toString() );
-        //System.out.println("Lo que contiene la posición numero 7 del array texto2 (byte): "+ encrypted_message);
-        //System.out.println("Lo que contiene la posición numero 7 del array text_bytes (char): "+ (char)sc.text_bytes[7]);
-        System.out.println(" string text encripted (arrayByteToString --char) : "+ arrayByteToString(encrypted_message));
-        //System.out.println( "Los bytes del texto que me caben en el ultimo bloque puntero_pad=" +  sc.puntero_pad);
-       // System.out.println( "len_withpad=" +  sc.len_withpadd);
-       // System.out.println( "array encriptado 7 "+ (char)sc.ec[(int)7]);
-        //System.out.println("Estoy pintando ec salida" +Arrays.toString(encrypted_message));
+        System.out.println("String text encripted (arrayByteToString --char) : "+ arrayByteToString(encrypted_message));
 
         byte[] decrypted_message= sc.decryptCBC(encrypted_message, sc.iv);
-        System.out.println("  string text decripted  "+arrayByteToString(decrypted_message));
+        System.out.println("String text decripted  "+arrayByteToString(decrypted_message));
 
     }
 

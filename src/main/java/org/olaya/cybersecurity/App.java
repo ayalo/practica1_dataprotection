@@ -15,7 +15,7 @@ import java.io.IOException;
 public class App
 {
     // MAIN PRACTICA 1
-    public static void main( String[] args ) throws Exception {
+/**    public static void main( String[] args ) throws Exception {
 
         SymmetricCipher  sc= new SymmetricCipher();
         System.out.println( "Hello World!" );
@@ -38,9 +38,9 @@ public class App
 
     }
 
-
+*/
  //PRACTICA 2
-/**
+
  public static void main( String[] args ) {
 
      System.out.println("Hello World!  Practica 2 ----");
@@ -113,7 +113,7 @@ public class App
 
  }
 
-*/
+
     /*************************************************************************************/
     /* Method arrayByteToString para convertir a char un array */
     /*************************************************************************************/

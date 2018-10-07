@@ -44,8 +44,8 @@ public class SymmetricCipher {
 
         byte [][] cipher2d= new byte[ec.length][block_size];; // array con los bloques encriptados + padding //quiza sobre uno
          // idem que ciper2d pero 1d
-
-        System.out.println("Encript text_bytes.length:"+ input.length);
+        System.out.println("Encript plaintext.length:"+ input.length);
+        System.out.println("Encript cipertext.length:"+ ciphertext.length);
         // Generate the ciphertext
 
         s = new SymmetricEncryption(byteKey);
@@ -136,31 +136,12 @@ public class SymmetricCipher {
                     ec[i] = Arrays.copyOfRange(input, ini, ini + block_size);
                     ini += block_size;
                 }
-        //System.out.println(" add pading despues de inicializaeal : "+Arrays.deepToString(ec));
 
-        //    try{
-                // Meto padding last block
-              //  if (input.length % block_size != 0) {
                     for (int i = (block_size - len_pad); i < block_size; i++) {
                         ec[total_blocks - 1][i] = (byte) len_pad;
                     }
                     System.out.println("Adding padding? :"+isEncript+" imprimo array 2d ec de dimensiones " + ec.length + " :");
                     System.out.println(Arrays.deepToString(ec));
-
-        //} else System.out.println("No se añade padding. Dimensiones del 2d : " + ec.length);
-            //}catch (IllegalBlockSizeException|BadPaddingException e){e.printStackTrace();}
-
-        /**    }catch ( BadPaddingException ebp ) {
-                    System.out.println("Exception:  BadPaddingException.");
-                    System.exit(-1);
-            }
-            //throw new IllegalBlockSizeException();
-        }catch ( IllegalBlockSizeException e ) {
-
-                System.out.println("Exception: IllegalBlockSizeException");
-                System.exit(-1);
-        }*/
-        //System.out.println(" addPadding return  "+Arrays.deepToString(ec));
 
         return ec;
     }

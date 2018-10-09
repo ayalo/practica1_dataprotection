@@ -15,7 +15,7 @@ import java.io.IOException;
 public class App
 {
     // MAIN PRACTICA 1
-/**    public static void main( String[] args ) throws Exception {
+    public static void main( String[] args ) throws Exception {
 
         SymmetricCipher  sc= new SymmetricCipher();
         System.out.println( "Hello World!" );
@@ -28,19 +28,18 @@ public class App
         //sc.readfile(file_path);
         byte[] encrypted_message= sc.encryptCBC(readFile(file_path), sc.iv);
 
-        System.out.println("String text encripted "+Arrays.toString(encrypted_message));
+        System.out.println("String text encripted :"+Arrays.toString(encrypted_message));
 
         writeFile(ecoutput_path,encrypted_message);
-        System.out.println("String text encripted (arrayByteToString --char) : "+ arrayByteToString(encrypted_message));
 
         byte[] decrypted_message= sc.decryptCBC(encrypted_message, sc.iv);
-        System.out.println("String text decripted  "+arrayByteToString(decrypted_message));
+        System.out.println("String text decripted : "+arrayByteToString(decrypted_message));
 
     }
 
-*/
- //PRACTICA 2
 
+ //PRACTICA 2
+/**
  public static void main( String[] args ) {
 
      System.out.println("Hello World!  Practica 2 ----");
@@ -113,7 +112,7 @@ public class App
 
  }
 
-
+/*
     /*************************************************************************************/
     /* Method arrayByteToString para convertir a char un array */
     /*************************************************************************************/

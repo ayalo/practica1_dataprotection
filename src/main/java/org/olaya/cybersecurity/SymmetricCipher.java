@@ -25,7 +25,8 @@ public class SymmetricCipher {
 
     //Mis variables
     int block_size= 16; // fijo el tamaño de bloque
-
+    int len_pad=0;
+    int len_withpad=0;
     /*************************************************************************************/
     /* Constructor method */
     /*************************************************************************************/
@@ -38,7 +39,7 @@ public class SymmetricCipher {
     public byte[] encryptCBC (byte[] input, byte[] byteKey) throws Exception {
         System.out.println(" Estoy en encryptCBC");
         // Generate the plaintext with padding
-        byte [][] ec= addPadding(input,true);  // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
+        byte [][] ec= addPadding(input);  // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
         //byte [][] ec= byte input;
         byte[] ciphertext = new byte [ec.length*block_size];
 
@@ -47,18 +48,19 @@ public class SymmetricCipher {
         System.out.println("Encript plaintext.length:"+ input.length);
         System.out.println("Encript cipertext.length:"+ ciphertext.length);
         // Generate the ciphertext
+        try {
+            s = new SymmetricEncryption(byteKey);
+            cipher2d[0] = s.encryptBlock(xor(ec[0], iv));
 
-        s = new SymmetricEncryption(byteKey);
-        cipher2d[0]=s.encryptBlock(xor(ec[0],iv));
-
-        for(int i=1;i<ec.length;i++){
-            cipher2d[i]=s.encryptBlock(xor(ec[i],cipher2d[i-1]));
-        }
-        int ini=0;
-        for (byte[] bloque : cipher2d) {
-            System.arraycopy(bloque, 0, ciphertext, ini, block_size);
-            ini += block_size;
-        }
+            for (int i = 1; i < ec.length; i++) {
+                cipher2d[i] = s.encryptBlock(xor(ec[i], cipher2d[i - 1]));
+            }
+            int ini = 0;
+            for (byte[] bloque : cipher2d) {
+                System.arraycopy(bloque, 0, ciphertext, ini, block_size);
+                ini += block_size;
+            }
+        }catch(BadPaddingException e){e.getMessage();}
         System.out.println("Encript imprimo array 2d cipher2d :");
         System.out.println(Arrays.deepToString(cipher2d));
 
@@ -76,35 +78,52 @@ public class SymmetricCipher {
         System.out.println(" Estoy en decryptCBC");
 
         d = new SymmetricEncryption(byteKey);
-        byte [][] ec= addPadding(input,false);  // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
-        //byte [][] ec= unPadding(input);
+        byte [][] ec= iniEc(input,len_pad);  // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
+
         byte[] finalplaintext = new byte [ec.length*block_size];
 
         // Generate the plaintext with padding
         byte [][] cipher2d= new byte[ec.length][block_size];; // array con los bloques encriptados + padding //quiza sobre uno
         // idem que ciper2d pero 1d
-
-        System.out.println("Decript text_bytes.length:"+ input.length);
-
+   // try{
         s = new SymmetricEncryption(byteKey);
-        cipher2d[0]=xor(d.decryptBlock(ec[0]),iv);
+        cipher2d[0] = xor(d.decryptBlock(ec[0]), iv);
 
-        for(int i=1;i<ec.length;i++){
-             cipher2d[i]=xor(d.decryptBlock(ec[i]),ec[i-1]);
+        for (int i = 1; i < ec.length; i++) {
+            cipher2d[i] = xor(d.decryptBlock(ec[i]), ec[i - 1]);
         }
 
-        System.out.println( "DEcript imprimo array 2d cipher2d :");
-        System.out.println(Arrays.deepToString(cipher2d));
-        int ini=0;
+        // Quitamos Padding
+        cipher2d = unPadding(cipher2d);
+
+        int ini = 0;
         for (byte[] bloque : cipher2d) {
             System.arraycopy(bloque, 0, finalplaintext, ini, block_size);
             ini += block_size;
         }
+   // }catch (BadPaddingException e){e.getMessage();}
+        // devuelvo el plaintext sin los bytes de padding de 0's
+        byte [] salida= Arrays.copyOfRange(finalplaintext,0,finalplaintext.length-len_pad);
+        System.out.println(" Array sin pad antes de retur decript:" +Arrays.toString(salida));
 
-        return finalplaintext;
+        return salida;  //Arrays.copyOfRange(finalplaintext,0,finalplaintext.length-len_pad);
     }
 
-
+    /*************************************************************************************/
+    /* Method iniEc */
+    /*************************************************************************************/
+    public byte [][] iniEc(byte [] ciphered ,int len_pad) throws Exception{
+        int total_blocks = len_withpad / block_size;
+        byte[][] ec = new byte[total_blocks][block_size];
+       // try{
+            int ini = 0;
+            for (int i = 0; i < (ec.length); i++) {
+                ec[i] = Arrays.copyOfRange(ciphered, ini, ini + block_size);
+                ini += block_size;
+            }
+       // }catch (IllegalBlockSizeException e){e.getMessage();}
+        return ec;
+    }
     /*************************************************************************************/
     /* Method addPadding */
     /*************************************************************************************/
@@ -114,42 +133,49 @@ public class SymmetricCipher {
 
     @exception BadPaddingException If the ciphertext is invalid.
     */
-    public byte[][] addPadding (byte[] input, boolean isEncript) throws Exception {
-        int len_withpad=0;
-        int len_pad=0;
-
-        if (isEncript) {
-           len_withpad = input.length + block_size - (input.length % block_size);// ej. 32 char mete bloque de mas si se ajusta al tamaño
-           len_pad= block_size -(input.length % block_size); //5 char  .
-        } else {
-            len_withpad = input.length;
-            len_pad=0;
-        }
-
+    public byte[][] addPadding (byte[] input) throws Exception {
+        len_withpad = input.length + block_size - (input.length % block_size);// ej. 32 char mete bloque de mas si se ajusta al tamaño
+        len_pad= block_size -(input.length % block_size); //5 char  .
+        //try {
         int total_blocks=len_withpad/block_size;
-        byte [][] ec= new byte[total_blocks][block_size]; // array que va a contener los bloques sin encriptar
+            byte[][] ec =iniEc(input,len_pad);
 
-        //try{
-
-                int ini = 0;
-                for (int i = 0; i < (ec.length); i++) {
-                    ec[i] = Arrays.copyOfRange(input, ini, ini + block_size);
-                    ini += block_size;
-                }
-
-                    for (int i = (block_size - len_pad); i < block_size; i++) {
-                        ec[total_blocks - 1][i] = (byte) len_pad;
-                    }
-                    System.out.println("Adding padding? :"+isEncript+" imprimo array 2d ec de dimensiones " + ec.length + " :");
-                    System.out.println(Arrays.deepToString(ec));
+             for (int i = (block_size - len_pad); i < block_size; i++) {
+                 ec[total_blocks - 1][i] = (byte) len_pad;
+                 //    throw new BadPaddingException;
+             }
+        // }catch (Exception e){e.getMessage();}
+        System.out.println(" addPadding, imprimo array 2d ec de dimensiones " + ec.length + " :");
+        System.out.println(Arrays.deepToString(ec));
 
         return ec;
     }
+    /*************************************************************************************/
+    /* Method unPadding */
+    /*************************************************************************************/
+    public byte[][] unPadding (byte[][] cipheredPadded) throws Exception {
+
+        int total_blocks=len_withpad/block_size;
+
+        System.out.println("En unPadding cipheredPadded :");
+        System.out.println(Arrays.deepToString(cipheredPadded));
+
+        for (int i =(block_size-len_pad); i < block_size; i++) {
+            cipheredPadded[total_blocks - 1][i] = (byte) 0x00;
+        }
+
+        System.out.println("Quitando el padding,  Contenido :");
+        System.out.println(Arrays.deepToString(cipheredPadded));
+
+        return cipheredPadded;
+
+    }
+
 
     /*************************************************************************************/
     /* Method XOR */
     /*************************************************************************************/
-    public byte[] xor (byte[] bloque1, byte[] bloque2) throws Exception {
+    public byte[] xor (byte[] bloque1, byte[] bloque2)  {
 
         byte [] resul= new byte [bloque1.length]; //bloque1.length siempre va a ser 16 pero por si acaso
         int i =0;
@@ -160,42 +186,7 @@ public class SymmetricCipher {
     }
 
 
-    /*************************************************************************************/
-    /* Method unPadding */
-    /*************************************************************************************/
-    /**   public byte[][] unPadding (byte[] input) throws Exception {
-     int len_withpad = input.length; //- block_size - (input.length % block_size); //+ block_size - (input.length % block_size);// ej. 32 char mete bloque de mas si se ajusta al tamaño
-     //int len_pad= block_size -(input.length % block_size); //5 char
-     int from_pad=(input.length % block_size);
-
-     int total_blocks=len_withpad/block_size;
-     byte [][] ec= new byte[total_blocks][block_size]; // array que va a contener los bloques sin encriptar
-     System.out.println("len_withpad :"+len_withpad+"  len_pad="+len_pad+"  total_blocks="+total_blocks);
-
-     System.out.println("Numero de bloques sin padding :"+ec.length);
-
-     int ini = 0;
-     for (int i = 0; i < (ec.length ); i++) {
-     ec[i] = Arrays.copyOfRange(input, ini, ini + block_size);
-     ini += block_size;
-     }
 
 
-     System.out.println("inicializando ec 2d  Contenido :");
-     System.out.println(Arrays.deepToString(ec));
-     System.out.println(  "block_size: "+block_size+ "total_blocks="+total_blocks);
-
-     for (int i =(block_size-len_pad); i < block_size; i++) {
-     ec[total_blocks - 1][i] = (byte) 0x00;
-     }
-
-     System.out.println("Quitando el padding,  Contenido :");
-     System.out.println(Arrays.deepToString(ec));
-
-     return ec;
-     //}
-
-     }
-     */
 }
 

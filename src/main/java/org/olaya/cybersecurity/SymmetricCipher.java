@@ -35,6 +35,10 @@ public class SymmetricCipher {
 
     /*************************************************************************************/
     /* Method to encrypt using AES/CBC/PKCS5 */
+    /* @ iniEc */
+    /* @ xor */
+    /* @ addPading */
+    /* @ encriptBlock */
     /*************************************************************************************/
     public byte[] encryptCBC (byte[] input, byte[] byteKey) throws Exception {
         System.out.println(" Estoy en encryptCBC");
@@ -70,6 +74,10 @@ public class SymmetricCipher {
 
     /*************************************************************************************/
     /* Method to decrypt using AES/CBC/PKCS5 */
+    /* @ iniEC */
+    /* @ xor */
+    /* @ decriptBlock */
+    /* @ unPadding */
     /*************************************************************************************/
 
 
@@ -78,7 +86,10 @@ public class SymmetricCipher {
         System.out.println(" Estoy en decryptCBC");
 
         d = new SymmetricEncryption(byteKey);
-        byte [][] ec= iniEc(input,len_pad);  // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
+
+
+        byte [][] ec= iniEc(input,input.length/block_size);   // len_pad = input.lenght/block_size
+        // tendriamos que contemplar si la salida no tiene el texto padeado o se ha perdido algun byte
 
         byte[] finalplaintext = new byte [ec.length*block_size];
 
@@ -112,7 +123,8 @@ public class SymmetricCipher {
     /*************************************************************************************/
     /* Method iniEc */
     /*************************************************************************************/
-    public byte [][] iniEc(byte [] ciphered ,int len_pad) throws Exception{
+    public byte [][] iniEc(byte [] ciphered,int len_pad) throws Exception{
+
         int total_blocks = len_withpad / block_size;
         byte[][] ec = new byte[total_blocks][block_size];
        // try{
@@ -154,9 +166,28 @@ public class SymmetricCipher {
     /* Method unPadding */
     /*************************************************************************************/
     public byte[][] unPadding (byte[][] cipheredPadded) throws Exception {
-
         int total_blocks=len_withpad/block_size;
+        System.out.println("longitud cipheredPadded"+cipheredPadded.length+" tb  "+total_blocks);
+        int last= (int)cipheredPadded[total_blocks-1][block_size-1];
+        if(last == block_size) {
+            System.out.println("Tdo el ultimo bloque es paddin");
+            len_pad=block_size;
+        }else {
 
+            int prevLast = (int) cipheredPadded[total_blocks - 1][block_size - last];
+            System.out.println("Ultimo byte del texto cifrado : " + (int) last);
+            System.out.println("Penultimo byte del texto cifrado : " + (int) prevLast);
+
+            System.out.println("Comparacion : " + (boolean) ((int) last == (int) prevLast));
+            for(int i=block_size-last;i<block_size;i++){
+                System.out.println("(int)cipheredPadded[total_blocks - 1][i] : " +i+"  "+ (int) (int)cipheredPadded[total_blocks - 1][i]);
+
+                if((int)cipheredPadded[total_blocks - 1][i]!=last){
+                    System.out.println("Error en el padding. No se puede recuperar el mensaje.");
+                    //exit 1; //o pillo excepcion
+                }else len_pad=last;
+            }
+        }
         System.out.println("En unPadding cipheredPadded :");
         System.out.println(Arrays.deepToString(cipheredPadded));
 

@@ -26,8 +26,8 @@ public class App
 
         System.out.println("String plain text - input :  "+arrayByteToString(readFile(file_path)));
         //sc.readfile(file_path);
-        byte[] encrypted_message= scEnc.encryptCBC(readFile(file_path), scEnc.iv);
 
+        byte[] encrypted_message= scEnc.encryptCBC(readFile(file_path), scEnc.iv);
         System.out.println("String text encripted :"+Arrays.toString(encrypted_message));
 
         writeFile(ecoutput_path,encrypted_message);
@@ -36,10 +36,7 @@ public class App
 
 
         byte[] decrypted_message= scDec.decryptCBC(encrypted_message, scDec.iv);
-
-        System.out.println("ESto e main"+Arrays.toString(decrypted_message));
         System.out.println("String text decripted : "+arrayByteToString(decrypted_message));
-        System.out.println("ESto e main");
 
     }
 

@@ -17,7 +17,7 @@ public class App
     // MAIN PRACTICA 1
     public static void main( String[] args ) throws Exception {
 
-        SymmetricCipher  sc= new SymmetricCipher();
+        SymmetricCipher  scEnc= new SymmetricCipher();
         System.out.println( "Hello World!" );
         // Fichero que contiene el texto String o texto plano a encriptar
         String file_path="/Users/olaya/IdeaProjects/practica1_dataprotection/text.txt";
@@ -26,14 +26,20 @@ public class App
 
         System.out.println("String plain text - input :  "+arrayByteToString(readFile(file_path)));
         //sc.readfile(file_path);
-        byte[] encrypted_message= sc.encryptCBC(readFile(file_path), sc.iv);
+        byte[] encrypted_message= scEnc.encryptCBC(readFile(file_path), scEnc.iv);
 
         System.out.println("String text encripted :"+Arrays.toString(encrypted_message));
 
         writeFile(ecoutput_path,encrypted_message);
 
-        byte[] decrypted_message= sc.decryptCBC(encrypted_message, sc.iv);
+        SymmetricCipher  scDec= new SymmetricCipher();
+
+
+        byte[] decrypted_message= scDec.decryptCBC(encrypted_message, scDec.iv);
+
+        System.out.println("ESto e main"+Arrays.toString(decrypted_message));
         System.out.println("String text decripted : "+arrayByteToString(decrypted_message));
+        System.out.println("ESto e main");
 
     }
 

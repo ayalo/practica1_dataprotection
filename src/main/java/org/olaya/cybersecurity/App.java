@@ -1,5 +1,7 @@
 package org.olaya.cybersecurity;
 
+import sun.java2d.pipe.SpanShapeRenderer;
+
 import java.io.*;
 import java.util.Arrays;
 import java.security.PublicKey;
@@ -15,6 +17,7 @@ import java.io.IOException;
 public class App
 {
     // MAIN PRACTICA 1
+/**
     public static void main( String[] args ) throws Exception {
 
         SymmetricCipher  scEnc= new SymmetricCipher();
@@ -40,7 +43,7 @@ public class App
 
     }
 
-
+*/
  //PRACTICA 2
 /**
  public static void main( String[] args ) {
@@ -62,6 +65,7 @@ public class App
          ObjectInputStream objetoPublicKey = new ObjectInputStream(publicFile);
          PublicKey publicKey = (PublicKey) objetoPublicKey.readObject();
 
+     // Encriptamos
         byte [] RSAencript =rsaLibrary.encrypt(readFile(filePath),publicKey);
         System.out.println(" Clave publica encriptada formato byte "+Arrays.toString(RSAencript));
 
@@ -114,8 +118,21 @@ public class App
 
 
  }
+*/
 
-/*
+
+ public static void main( String[] args ) {
+
+ System.out.println("Hello World!  Practica 3 ----");
+
+     SimpleSec simpleSec = new SimpleSec();
+    simpleSec.SimpleSec();
+
+
+ }
+
+
+
     /*************************************************************************************/
     /* Method arrayByteToString para convertir a char un array */
     /*************************************************************************************/

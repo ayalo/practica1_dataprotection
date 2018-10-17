@@ -29,10 +29,23 @@ public class SimpleSec {
 
         try {
 
+            System.out.println("SimpleSec - Generamos las claves :");
             rsaLibrary.generateKeys();
-            String filePrivateKey = "./private.key"; // private encriptada con la passphrase
-            encriptPrivateKey(filePrivateKey,giveMePassphrase());
+            String filePrivateKey = "./private.key"; // Acordanos de borrar este
+            String pathPrivateKeySalida = "./private_salida.key"; // private encriptada con la passphrase
+            String pathDecriptedPrivateKeySalida = "./private_Decripted.key"; // private encriptada con la passphrase
 
+            byte [] PrivateKey =writePKey(filePrivateKey);
+            System.out.println("SimpleSec - Salida = "+Arrays.toString(PrivateKey));
+            System.out.println("SimpleSec - Encriptamos clave privada con passphrase : se genera private_salida.key");
+            encriptPrivateKey(PrivateKey,pathPrivateKeySalida,giveMePassphrase());
+            System.out.println("SimpleSec - Desencriptamos clave privada :");
+            byte [] SALIDA=decriptPrivateKey(pathPrivateKeySalida,giveMePassphrase(),pathDecriptedPrivateKeySalida);
+            System.out.println("SimpleSec - Salida DECRIPT= "+Arrays.toString(SALIDA));
+
+
+
+/**
             String filePath = "./text.txt";
             String filePublicKey = "./public.key";
             String filePrivateKeyCiphered = "./privateCiph.key"; // private encriptada con la passphrase
@@ -76,7 +89,7 @@ public class SimpleSec {
             //public byte[] encryptCBC (byte[] input, byte[] byteKey)
 
 
-
+*/
 
         }catch(Exception e){
             System.out.println("SimpleSec -  Exception  "+e.getMessage()+"   message  ") ;
@@ -87,7 +100,7 @@ public class SimpleSec {
     /*************************************************************************************/
     /* Method  from keypad */
     /*************************************************************************************/
-    public void  encriptPrivateKey( String filePrivateKey, byte [] passphraseByte ) throws Exception {
+ /**   public void  encriptPrivateKey( String filePrivateKey, byte [] passphraseByte ) throws Exception {
         // leemos fichero clave privada como byte[]
         byte [] privateKeyByte = readFile(filePrivateKey);
         SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
@@ -95,6 +108,34 @@ public class SimpleSec {
         System.out.println( "SimpleSec -  privateKeyByte.length :  "+privKeyEncript.length);
 
         writeFileLine(filePrivateKey,privKeyEncript);
+
+    }*/
+    /*************************************************************************************/
+    /* Method  from keypad */
+    /*************************************************************************************/
+    public void  encriptPrivateKey( byte [] privateKeyByte,String path, byte [] passphraseByte ) throws Exception {
+        // leemos fichero clave privada como byte[]
+
+       // byte [] privateKeyByte = readFile(filePrivateKey);
+        SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
+        byte [] privKeyEncript = scEnc.encryptCBC(privateKeyByte,passphraseByte);
+        System.out.println( "SimpleSec -  privateKeyByte.length :  "+privKeyEncript.length);
+
+        writeFile(path,privKeyEncript);
+
+    }
+    /*************************************************************************************/
+    /* Method  from keypad */
+    /*************************************************************************************/
+    public void  decriptPrivateKey( String pathPrivateKeyByteENC, byte [] passphraseByte , String pathSalida) throws Exception {
+        // leemos fichero clave privada como byte[]
+
+        byte [] privateKeyDECByte = readFile(pathPrivateKeyByteENC);
+        SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
+        byte [] privKeyDEncript = scEnc.decryptCBC(privateKeyDECByte,passphraseByte);
+        System.out.println( "SimpleSec -  privKeyDEncript.length :  "+privKeyDEncript.length);
+
+        writeFile(pathSalida,privKeyDEncript);
 
     }
     /*************************************************************************************/
@@ -187,17 +228,17 @@ public class SimpleSec {
     /*************************************************************************************/
     /* Method writefile por lineas  */
     /*************************************************************************************/
-    public static  byte [] writeFileLine (String output_path,byte[] output) throws Exception {
+    public static byte [] writePKey(String output_path) throws Exception {
         Path path = null;
-        byte [] outputFichero= null;
+        byte [] bytePKeyEncripted= null;
         try {
             path = Paths.get(output_path);
-            outputFichero = Files.readAllBytes(path);
+            bytePKeyEncripted= Files.readAllBytes(path);
 
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
-        return outputFichero;
+        return bytePKeyEncripted;
     }
 }
 

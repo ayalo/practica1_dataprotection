@@ -121,13 +121,14 @@ public class App
 */
 
 
- public static void main( String[] args ) {
+ public static void main( String[] args ) throws Exception {
+     // capturar la excepción y manejar que no se quede vacia ni sean mas de 16bytes.
 
  System.out.println("Hello World!  Practica 3 ----");
 
-     SimpleSec simpleSec = new SimpleSec();
-    simpleSec.SimpleSec();
 
+     SimpleSec simpleSec = new SimpleSec();
+     simpleSec.SimpleSec();
 
  }
 

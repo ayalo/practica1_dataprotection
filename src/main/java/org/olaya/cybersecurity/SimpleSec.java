@@ -13,9 +13,16 @@ import java.security.SecureRandom;
 public class SimpleSec {
 
 
-    public void  SimpleSec (){//( char command, String sourceFile, String destinationFile) {
+    public void  SimpleSec () throws Exception{ //(String passphrase){//( char command, String sourceFile, String destinationFile) {
 
-        RSALibrary rsaLibrary = new RSALibrary();
+        RSALibrary rsaLibrary = new RSALibrary();       // Practica 2
+        SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
+
+        // Temporary fix passprhase
+        // String passphrase = new String ("1234567890123456");
+
+        byte [] passphraseByte = giveMePassphrase();
+
 
         try {
 
@@ -27,37 +34,31 @@ public class SimpleSec {
             String filePrivateKeyCiphered = "/Users/olaya/IdeaProjects/practica1_dataprotection/privateCiph.key"; // private encriptada con la passphrase
 
             // leo clave publica
-            System.out.println("  String plain text - input :  " + arrayByteToString(readFile(filePath)));
-
+            System.out.println("SimpleSec - String plain text - input :  " + arrayByteToString(readFile(filePath)));
+            // Estabish random sessionKey
             SecureRandom r = new SecureRandom();
             byte[] sessionKey = new byte[16];
             r.nextBytes(sessionKey);
-
-            String passphrase = new String ("1234567890123456");
-            byte [] passphraseByte = passphrase.getBytes();
-
-            SymmetricCipher  scEnc= new SymmetricCipher();
 
 
             FileInputStream publicFile = new FileInputStream(filePublicKey);
             ObjectInputStream objetoPublicKey = new ObjectInputStream(publicFile);
             PublicKey publicKey = (PublicKey) objetoPublicKey.readObject();
 
-
             // Cipher plaintext input encripted with SessionKey
             byte[] encryptedPlainText = scEnc.encryptCBC(readFile(filePath), sessionKey);
-            System.out.println("String plaintext encripted with sessionKey :"+Arrays.toString(encryptedPlainText));
+            System.out.println("SimpleSec - String plaintext encripted with sessionKey length: "+encryptedPlainText.length);
 
             // SesionKey encripted with publicKey
             byte[] sessionKeyEncripted= rsaLibrary.encrypt(sessionKey, publicKey);
-            System.out.println("sessionKey encripted with publicKey" + Arrays.toString(sessionKeyEncripted));
+            System.out.println("SimpleSec - SessionKey encripted with publicKey length: " + sessionKeyEncripted.length);
 
             //Concatenation encryptedPlainText and sessionKeyEncripted
             byte [] finalEncriptedFile =new byte[encryptedPlainText.length + sessionKeyEncripted.length];
             System.arraycopy(encryptedPlainText, 0, finalEncriptedFile, 0, encryptedPlainText.length);
             System.arraycopy(sessionKeyEncripted, 0, finalEncriptedFile, encryptedPlainText.length, sessionKeyEncripted.length);
 
-            System.out.println(" Array sin pad antes de retur decript:" +Arrays.toString(finalEncriptedFile));
+            System.out.println("SimpleSec -  Array sin pad antes de retur decript: " +finalEncriptedFile.length);
 
             // PrivateKey
             FileInputStream privateFile = new FileInputStream(filePrivateKey);
@@ -66,29 +67,58 @@ public class SimpleSec {
 
             // Signature finalEncriptedFile  (Concatenation encryptedPlainText and sessionKeyEncripted)
             byte[] signature= rsaLibrary.sign(finalEncriptedFile,privateKey);
-            System.out.println("Mensaje con Firma :  "+arrayByteToString(signature));
+            System.out.println("SimpleSec - Mensaje con Firma :  "+signature.length);
 
 
             //public byte[] encryptCBC (byte[] input, byte[] byteKey)
 
             // leemos fichero clave privada como byte[]
             byte [] privateKeyByte = readFile(filePrivateKey);
-            System.out.println( " privateKeyByte:  "+arrayByteToString(privateKeyByte));
-            System.out.println( " privateKeyByte.lengt :"+ privateKeyByte.length);
-            System.out.println( " sessionKey :"+ arrayByteToString(sessionKey));
-            System.out.println( " sessionKey.lengt :"+ sessionKey.length);
+            System.out.println( "SimpleSec -  privateKeyByte.lengt : "+ privateKeyByte.length);
+            System.out.println( "SimpleSec -  sessionKey.lengt : "+ sessionKey.length);
 
             byte [] privKeyEncript = scEnc.encryptCBC(privateKeyByte,passphraseByte);
-            System.out.println( " privateKeyByte:  "+arrayByteToString(privateKeyByte));
+            System.out.println( "SimpleSec -  privateKeyByte.length :  "+privKeyEncript.length);
 
             writeFile(filePrivateKeyCiphered,privKeyEncript);
 
 
         }catch(Exception e){
-            System.out.println(" Exception  "+e.getMessage()+"   message  ") ;
+            System.out.println("SimpleSec -  Exception  "+e.getMessage()+"   message  ") ;
             e.printStackTrace();
         }
 
+    }
+    /*************************************************************************************/
+    /* Method giveMePassphrase from keypad */
+    /*************************************************************************************/
+    public byte [] giveMePassphrase ( ) throws Exception{
+        // Hacer que si la password es mas pequeña se rellene con otros caracteres hasta 16
+
+        System.out.println("SimpleSec -  Give the passphrase:");
+        BufferedReader readpassph = new BufferedReader(new InputStreamReader(System.in));
+        String passph = readpassph.readLine();
+        System.out.println("SimpleSec -  Qué vale passph: " + passph.toString());
+        if (!checkPassprhase((byte [])passph.getBytes())){
+
+             System.out.println("SimpleSec -  Execute again the program with a new passphrase.");
+             System.exit(1);
+        }
+
+        return passph.getBytes();
+
+    }
+    /*************************************************************************************/
+    /* Method checkPassprhase for check lenght of the passphrase */
+    /*************************************************************************************/
+    public boolean checkPassprhase ( byte [] passph) throws Exception {
+
+        if (passph.length != 16 ) {
+                System.out.println("SimpleSec - The passphrase must have 16 characters. ");
+                return false;
+        }
+        else
+            return true;
     }
 
         /*************************************************************************************/

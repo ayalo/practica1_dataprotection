@@ -43,7 +43,7 @@ public class SymmetricCipher {
         int len_pad= block_size -(input.length % block_size); //5 char  .
         int len_withpad = input.length + block_size - (input.length % block_size);// ej. 32 char mete bloque de mas si se ajusta al tamaño
 
-        System.out.println(" Estoy en encryptCBC");
+        System.out.println("SymmetricCipher - Estoy en encryptCBC");
         //System.out.println(" encryptCBC, len_withpad "+len_withpad);
         //System.out.println(" encryptCBC, len_pad "+len_pad);
 
@@ -68,7 +68,7 @@ public class SymmetricCipher {
                 ini += block_size;
             }
         }catch(Exception e){e.getMessage();}
-        System.out.println("Encript, imprimo array 2d cipher2d :");
+        System.out.println("SymmetricCipher - Encript, imprimo array 2d cipher2d :");
         System.out.println(Arrays.deepToString(cipher2d));
 
         return ciphertext;
@@ -86,7 +86,7 @@ public class SymmetricCipher {
 
     public byte[] decryptCBC (byte[] input, byte[] byteKey) throws Exception {
 
-        System.out.println(" Estoy en decryptCBC");
+        System.out.println("SymmetricCipher - Estoy en decryptCBC");
         int len_pad=0;
         int len_withpad=input.length;
         int total_blocks= len_withpad / block_size;
@@ -115,12 +115,12 @@ public class SymmetricCipher {
             int last = (int) cipher2d[total_blocks-1][block_size-1];
                 for (int i =(int)cipher2d[total_blocks-1].length - last; i < block_size; i++) {
                     if ((int) cipher2d[total_blocks-1][i] != last) {
-                        System.out.println("Error en el padding. No se puede recuperar el mensaje.");
+                        System.out.println("SymmetricCipher - Error en el padding. No se puede recuperar el mensaje.");
                         throw  new BadPaddingException();
                     } else len_pad = last;
                 }
         }catch (ArrayIndexOutOfBoundsException e ){
-            System.out.println(" Exception  "+e.getMessage()+"   message  ") ; // java.lang.ArrayIndexOutOfBoundsException:
+            System.out.println("SymmetricCipher - Exception  "+e.getMessage()+"   message  ") ; // java.lang.ArrayIndexOutOfBoundsException:
             e.printStackTrace();
         }
 
@@ -135,7 +135,7 @@ public class SymmetricCipher {
         // }catch (BadPaddingException e){e.getMessage();}
         // devuelvo el plaintext sin los bytes de padding de 0's
         byte [] salida= Arrays.copyOfRange(finalplaintext,0,finalplaintext.length-len_pad);
-        System.out.println(" Array sin pad antes de retur decript:" +Arrays.toString(salida));
+        System.out.println("SymmetricCipher - Array sin pad antes de retur decript:" +Arrays.toString(salida));
 
         return salida;  //Arrays.copyOfRange(finalplaintext,0,finalplaintext.length-len_pad);
     }
@@ -181,7 +181,7 @@ public class SymmetricCipher {
                  //    throw new BadPaddingException;
              }
          }catch (Exception e){e.printStackTrace();} ////ArrayIndexOutOfBoundsException
-        System.out.println(" addPadding, imprimo array 2d ec de dimensiones " + ec.length + " :");
+        System.out.println("SymmetricCipher - addPadding, imprimo array 2d ec de dimensiones " + ec.length + " :");
         System.out.println(Arrays.deepToString(ec));
 
         return ec;
@@ -192,14 +192,14 @@ public class SymmetricCipher {
     public byte[][] unPadding (byte[][] cipheredPadded, int len_pad) throws Exception {
         int total_blocks=cipheredPadded.length;
 
-        System.out.println("En unPadding cipheredPadded :"+total_blocks);
+        System.out.println("SymmetricCipher - En unPadding cipheredPadded :"+total_blocks);
         System.out.println(Arrays.deepToString(cipheredPadded));
 
         for (int i =(block_size-len_pad); i < block_size; i++) {
             cipheredPadded[total_blocks - 1][i] = (byte) 0x00;
         }
 
-        System.out.println("Quitando el padding,  Contenido :");
+        System.out.println("SymmetricCipher - Quitando el padding,  Contenido :");
         System.out.println(Arrays.deepToString(cipheredPadded));
 
         return cipheredPadded;

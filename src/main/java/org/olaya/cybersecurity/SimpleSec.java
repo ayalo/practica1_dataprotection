@@ -1,6 +1,7 @@
 package org.olaya.cybersecurity;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -8,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 public class SimpleSec {
@@ -16,22 +19,23 @@ public class SimpleSec {
     public void  SimpleSec () throws Exception{ //(String passphrase){//( char command, String sourceFile, String destinationFile) {
 
         RSALibrary rsaLibrary = new RSALibrary();       // Practica 2
-        SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
+        SymmetricCipher scEnc= new SymmetricCipher();  // Practica 1
 
         // Temporary fix passprhase
         // String passphrase = new String ("1234567890123456");
 
-        byte [] passphraseByte = giveMePassphrase();
+       // byte [] passphraseByte = giveMePassphrase();
 
 
         try {
 
             rsaLibrary.generateKeys();
+            String filePrivateKey = "./private.key"; // private encriptada con la passphrase
+            encriptPrivateKey(filePrivateKey,giveMePassphrase());
 
-            String filePath = "/Users/olaya/IdeaProjects/practica1_dataprotection/text.txt";
-            String filePublicKey = "/Users/olaya/IdeaProjects/practica1_dataprotection/public.key";
-            String filePrivateKey = "/Users/olaya/IdeaProjects/practica1_dataprotection/private.key"; // private encriptada con la passphrase
-            String filePrivateKeyCiphered = "/Users/olaya/IdeaProjects/practica1_dataprotection/privateCiph.key"; // private encriptada con la passphrase
+            String filePath = "./text.txt";
+            String filePublicKey = "./public.key";
+            String filePrivateKeyCiphered = "./privateCiph.key"; // private encriptada con la passphrase
 
             // leo clave publica
             System.out.println("SimpleSec - String plain text - input :  " + arrayByteToString(readFile(filePath)));
@@ -69,24 +73,28 @@ public class SimpleSec {
             byte[] signature= rsaLibrary.sign(finalEncriptedFile,privateKey);
             System.out.println("SimpleSec - Mensaje con Firma :  "+signature.length);
 
-
             //public byte[] encryptCBC (byte[] input, byte[] byteKey)
 
-            // leemos fichero clave privada como byte[]
-            byte [] privateKeyByte = readFile(filePrivateKey);
-            System.out.println( "SimpleSec -  privateKeyByte.lengt : "+ privateKeyByte.length);
-            System.out.println( "SimpleSec -  sessionKey.lengt : "+ sessionKey.length);
 
-            byte [] privKeyEncript = scEnc.encryptCBC(privateKeyByte,passphraseByte);
-            System.out.println( "SimpleSec -  privateKeyByte.length :  "+privKeyEncript.length);
-
-            writeFile(filePrivateKeyCiphered,privKeyEncript);
 
 
         }catch(Exception e){
             System.out.println("SimpleSec -  Exception  "+e.getMessage()+"   message  ") ;
             e.printStackTrace();
         }
+
+    }
+    /*************************************************************************************/
+    /* Method  from keypad */
+    /*************************************************************************************/
+    public void  encriptPrivateKey( String filePrivateKey, byte [] passphraseByte ) throws Exception {
+        // leemos fichero clave privada como byte[]
+        byte [] privateKeyByte = readFile(filePrivateKey);
+        SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
+        byte [] privKeyEncript = scEnc.encryptCBC(privateKeyByte,passphraseByte);
+        System.out.println( "SimpleSec -  privateKeyByte.length :  "+privKeyEncript.length);
+
+        writeFileLine(filePrivateKey,privKeyEncript);
 
     }
     /*************************************************************************************/
@@ -176,7 +184,20 @@ public class SimpleSec {
                 }
             }
         }
+    /*************************************************************************************/
+    /* Method writefile por lineas  */
+    /*************************************************************************************/
+    public static  byte [] writeFileLine (String output_path,byte[] output) throws Exception {
+        Path path = null;
+        byte [] outputFichero= null;
+        try {
+            path = Paths.get(output_path);
+            outputFichero = Files.readAllBytes(path);
 
-
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return outputFichero;
     }
+}
 

@@ -27,7 +27,6 @@ public class RSALibrary {
     //String to hold the name of the private key file.
     public final String PRIVATE_KEY_FILE = "./private.key";
 
-
     // String to hold name of the public key file.
     public final String PUBLIC_KEY_FILE = "./public.key";
 
@@ -64,7 +63,6 @@ public class RSALibrary {
             FileOutputStream privateFile = new FileOutputStream(PRIVATE_KEY_FILE);
             ObjectOutputStream objetoPrivateKey= new ObjectOutputStream(privateFile);
             ((ObjectOutputStream) objetoPrivateKey).writeObject(privateKey);
-
             privateFile.close();
 
 
@@ -72,6 +70,29 @@ public class RSALibrary {
             System.out.println("RSALibrary - Exception: " + e.getMessage());
             System.exit(-1);
         }
+    }
+
+    /***********************************************************************************/
+    /* Generates an RSA key pair (a public and a private key) of 1024 bits length */
+    /* Stores the keys in the files defined by PUBLIC_KEY_FILE and PRIVATE_KEY_FILE */
+    /* Throws IOException */
+    /***********************************************************************************/
+    public KeyPair getKeyPair() throws IOException {
+
+        try {
+
+            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITHM);
+            keyGen.initialize(1024);
+
+            KeyPair keyPair= keyGen.genKeyPair();
+            return keyPair;
+
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("RSALibrary - Exception: " + e.getMessage());
+            System.exit(-1);
+            return null;
+        }
+
     }
 
 
@@ -122,7 +143,7 @@ public class RSALibrary {
             cipher.init(Cipher.DECRYPT_MODE,key);
 
             plaintext = cipher.doFinal(ciphertext);
-            System.out.println("RSALibrary -  En Decript: ciphertext :  "+ciphertext.toString());
+            System.out.println("RSALibrary - En Decript: ciphertext :  "+ciphertext.toString());
 
         } catch (Exception ex) {
             ex.printStackTrace();

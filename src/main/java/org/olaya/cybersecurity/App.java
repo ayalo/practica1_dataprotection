@@ -128,7 +128,15 @@ public class App
 
 
      SimpleSec simpleSec = new SimpleSec();
-     simpleSec.SimpleSec();
+     System.out.println("Main - Generamos Claves : ----------------------------------------------- ");
+     simpleSec.call("g","text.txt","SALIDA.txt");
+     System.out.println("------------------------------------------------------------------------- ");
+     System.out.println("Main - Encriptamos fichero: --------------------------------------------- ");
+     simpleSec.call("e","text.txt","ficheroSALIDA.txt");
+     System.out.println("------------------------------------------------------------------------- ");
+     System.out.println("Main - DESencriptamos fichero: ------------------------------------------ ");
+     simpleSec.call("d","ficheroSALIDA.txt","textDECRIPT.txt");
+
 
  }
 

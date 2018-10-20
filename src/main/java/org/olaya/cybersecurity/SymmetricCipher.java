@@ -86,7 +86,7 @@ public class SymmetricCipher {
 
     public byte[] decryptCBC (byte[] input, byte[] byteKey) throws Exception {
 
-        System.out.println("SymmetricCipher - Estoy en decryptCBC");
+        //System.out.println("SymmetricCipher - Estoy en decryptCBC");
         int len_pad=0;
         int len_withpad=input.length;
         int total_blocks= len_withpad / block_size;

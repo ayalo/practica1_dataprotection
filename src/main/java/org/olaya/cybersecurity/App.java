@@ -126,6 +126,7 @@ public class App
 
  System.out.println("Hello World!  Practica 3 ----");
 
+    System.out.println("args "+Arrays.toString(args));
 
      SimpleSec simpleSec = new SimpleSec();
      System.out.println("Main - Generamos Claves : ----------------------------------------------- ");
@@ -135,7 +136,7 @@ public class App
      simpleSec.call("e","text.txt","ficheroSALIDA.txt");
      System.out.println("------------------------------------------------------------------------- ");
      System.out.println("Main - DESencriptamos fichero: ------------------------------------------ ");
-     simpleSec.call("d","ficheroSALIDA.txt","textDECRIPT.txt");
+     simpleSec.call("d","ficheroSALIDA.txt","textDECRIPTED.txt");
 
 
  }

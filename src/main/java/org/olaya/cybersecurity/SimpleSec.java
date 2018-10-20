@@ -14,10 +14,6 @@ import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
 
 
 
@@ -29,28 +25,40 @@ public class SimpleSec {
     String filePath =null;
     String claveprivada = "./private_original.key"; //BORRAR
     String pathSalida = "./privateKeyDECRIPTED.key"; //BORRAR
-    String pathSalidaBACK = "./privateKeyDECRIPTEDBACK.key"; //Borrar
+    String pathSalidaBACK = "./privateKeyDECRIPTEDBACK.key"; //BORRAR
     String destinationFile="";
+    String fileENCRIPTED=""; // para el decript y no sobreescribir
+    String destinationFileDECRIPTED=""; // para el decript y no sobreescribir
 
 
     public void  call (String command, String sourceFile, String destinationFile )throws Exception {
 
         if (command == "g") {
-
-            filePath="./"+sourceFile;
+            filePath=sourceFile;
             pair=getPairKeys();
 
         } else if (command == "e") {
-            filePath="./"+sourceFile;
-            destinationFile="./"+destinationFile;
+            //filePath="./"+sourceFile;
+            //destinationFile="./"+destinationFile;
+            filePath=sourceFile;
+            destinationFile=destinationFile;
+            //if [pair == null ]  --> tratar
             getENCText(filePath, destinationFile,pair);
 
         } else if (command == "d") {
-            // getDECText(sourceFile, destinationFile);
+            fileENCRIPTED=sourceFile;
+            destinationFileDECRIPTED=destinationFile;
+            //System.out.println("fileENCRIP.length = "+fileENCRIPTED.length());
+            //System.out.println("destinationFileDECRIPTED.length = "+destinationFileDECRIPTED.length());
+
+            //if [pair == null ]  --> tratar
+            getDECText(fileENCRIPTED,destinationFileDECRIPTED,pair);
+
         }else System.out.println("Debes introducir bien los parametros");
 
 
     }
+
 
     public KeyPair  getPairKeys ( ) throws Exception{
 
@@ -119,11 +127,14 @@ public class SimpleSec {
 */
     public void getENCText(String sourceFile,String destinationFile,KeyPair pair) {
 
-        String filePath = "./"+sourceFile;
+        //String filePath = sourceFile;
         // Establish random sessionKey
         SecureRandom r = new SecureRandom();
         byte[] sessionKey = new byte[16];
         r.nextBytes(sessionKey);
+        System.out.println("getENCText - SessionKey al inicio : "+sessionKey.length);
+        System.out.println("getENCText - SessionKey byts:"+arrayByteToString(sessionKey));
+
         try {
             // Establish publicKey in file PUBLIC_KEY_FILE
             PublicKey publicKey = pair.getPublic();
@@ -135,27 +146,21 @@ public class SimpleSec {
          publicFile.close();
          */
 
-        System.out.println("SimpleSec - fichero a guardar en disco :");
+/**        System.out.println("SimpleSec - fichero a guardar en disco :");
         // filePath =giveMeTextFile();
         System.out.println("String plain text - input :  "+arrayByteToString(readFile(filePath)));
-
+*/
         // Cipher plaintext input encripted with SessionKey
         byte[] encryptedPlainText = scEnc.encryptCBC(readFile(filePath), sessionKey);
-        System.out.println("SimpleSec - String plaintext encripted with sessionKey length: "+encryptedPlainText.length);
+        //System.out.println("SimpleSec - String plaintext encripted with sessionKey length: "+encryptedPlainText.length);
+        //System.out.println("SimpleSec - publicKey length: " + publicKey.toString());
 
         // SesionKey encripted with publicKey
         byte[] sessionKeyEncripted= rsaLibrary.encrypt(sessionKey, publicKey);
-        System.out.println("SimpleSec - SessionKey encripted with publicKey length: " + sessionKeyEncripted.length);
-
-        //Concatenation encryptedPlainText and sessionKeyEncripted
-        byte [] finalEncriptedFile =new byte[encryptedPlainText.length + sessionKeyEncripted.length];
-        System.arraycopy(encryptedPlainText, 0, finalEncriptedFile, 0, encryptedPlainText.length);
-        System.arraycopy(sessionKeyEncripted, 0, finalEncriptedFile, encryptedPlainText.length, sessionKeyEncripted.length);
-
-        System.out.println("SimpleSec -  Array sin pad antes de return decript: " +finalEncriptedFile.length);
+        //System.out.println("SimpleSec - SessionKey encripted with publicKey length: " + sessionKeyEncripted.length);
 
         // PrivateKey Desencript
-
+/**  Meter en funcion */
         System.out.println("SimpleSec - Desencriptamos la privateKey para ver si queda igual : ");
         String pathSalida = "./privateKeyDECRIPTED.key";
         byte [] privKeyDEncript = decriptPrivateKey(rsaLibrary.PRIVATE_KEY_FILE,giveMePassphrase(),pathSalida);
@@ -176,12 +181,30 @@ public class SimpleSec {
 
 */
 
-        System.out.println("Calculamos Firma---  ");
-        // Signature finalEncriptedFile  (Concatenation encryptedPlainText and sessionKeyEncripted)
-        byte [] fileSigned= rsaLibrary.sign(finalEncriptedFile,privateKeyDEC);
-        System.out.println("Longitud Firma :  "+fileSigned.length);
+ /**       PrivateKey privateKeyDEC = getPrivateKeyDECRIPTED("privateKeyDECRIPTED.key"); */
 
-        // Guardo fichero con la firma
+        //System.out.println("Calculamos Firma---  ");
+        // Signature encryptedPlainText ( firma del texto encriptado)
+        //byte [] finalEncriptedFile =new byte[encryptedPlainText.length + sessionKeyEncripted.length+];
+         //   System.arraycopy(encryptedPlainText, 0, finalEncriptedFile, 0, encryptedPlainText.length);
+         //   System.arraycopy(sessionKeyEncripted, 0, finalEncriptedFile, encryptedPlainText.length, sessionKeyEncripted.length);
+
+
+            //byte [] fileSigned= rsaLibrary.sign(finalEncriptedFile,privateKeyDEC);
+        //System.out.println("Longitud Firma :  "+fileSigned.length);
+
+        //Concatenation encryptedPlainText and sessionKeyEncripted + (falta ) la firma
+        byte [] finalEncriptedFile =new byte[encryptedPlainText.length + sessionKeyEncripted.length]; // por ser RSA 1024 la firma ocupa eso
+        System.arraycopy(encryptedPlainText, 0, finalEncriptedFile, 0, encryptedPlainText.length);
+        System.arraycopy(sessionKeyEncripted, 0, finalEncriptedFile, encryptedPlainText.length, sessionKeyEncripted.length);
+        byte [] signature= rsaLibrary.sign(finalEncriptedFile,privateKeyDEC);
+        byte [] fileSigned=new byte [finalEncriptedFile.length+signature.length];
+        System.arraycopy(finalEncriptedFile, 0, fileSigned, 0, finalEncriptedFile.length);
+        System.arraycopy(signature, 0, fileSigned, finalEncriptedFile.length, signature.length);
+
+        //byte [] finalEncriptedFile = Arrays.copyOfRange(fileSigned,0,fileSigned.length );
+        //System.out.println("SimpleSec -  finalEncriptedFile.length : " +finalEncriptedFile.length);
+
         //    public static void writeFile (String output_path,byte[] output) throws Exception {
         writeFile(destinationFile,fileSigned);
 
@@ -196,8 +219,8 @@ public class SimpleSec {
     public byte []  encriptPrivateKey( byte [] privateKeyByte, byte [] passphraseByte ) throws Exception {
         //SymmetricCipher  scEnc= new SymmetricCipher();  // Practica 1
         byte [] privKeyEncript = scEnc.encryptCBC(privateKeyByte,passphraseByte);
-        System.out.println("SimpleSec - privateKeyByte.length = "+privateKeyByte.length);
-        System.out.println( "SimpleSec -  privateKeyByte.length CON PAD :  "+privKeyEncript.length);
+        //System.out.println("SimpleSec - privateKeyByte.length = "+privateKeyByte.length);
+        //System.out.println( "SimpleSec -  privateKeyByte.length CON PAD :  "+privKeyEncript.length);
         return privKeyEncript;
     }
 
@@ -212,8 +235,8 @@ public class SimpleSec {
         Path privateKeyPath= Paths.get(PRIVATE_KEY_FILE_ENCRIPTED);
         byte [] privateKeyDECByte = Files.readAllBytes(privateKeyPath);
         byte [] privKeyDEncript = scEnc.decryptCBC(privateKeyDECByte,passphraseByte);
-        System.out.println( "SimpleSec -  privKeyDECRIPTED.length :  "+privKeyDEncript.length);
-        System.out.println( "SimpleSec -  privKeyDECRIPTED.toString :  "+arrayByteToString(privKeyDEncript));
+        //System.out.println( "SimpleSec -  privKeyDECRIPTED.length :  "+privKeyDEncript.length);
+        //System.out.println( "SimpleSec -  privKeyDECRIPTED.toString :  "+arrayByteToString(privKeyDEncript));
         /**
         ByteArrayInputStream bai = new ByteArrayInputStream(privKeyDEncript);
         ObjectInput aux = new ObjectInputStream(bai);
@@ -240,6 +263,136 @@ public class SimpleSec {
         }
 
         return passph.getBytes();
+
+    }
+    // devuelte texto session y firma byte [][]
+    public byte [][]  extract (String fileENCRIPTED) {
+
+        byte[][] extracted = new byte[3][];
+        byte [] sourceBytes=null;
+        Path fileENCRIPTEDPath= Paths.get(fileENCRIPTED);
+        try {
+            sourceBytes = Files.readAllBytes(fileENCRIPTEDPath);
+        }catch (Exception e) { e.printStackTrace();}
+
+        System.out.println("extract -  publicKey.lenght : " + pair.getPublic().getEncoded().length);
+        System.out.println("extract -  sourceBytes of fileENCRIPTED.lenght : " + sourceBytes.length);
+
+        System.out.println("extract -  Indice que se va ahora  desde 0 hasta : " + (sourceBytes.length-128-128));
+
+        byte [] encryptedPlainText = Arrays.copyOfRange(sourceBytes,0, sourceBytes.length-128-128); //Suponemos firma y ENCsessionKey+publicKey.length =128each
+        System.out.println("extract -  Extracting encryptedPlainText .lenght : " + encryptedPlainText.length);
+        System.out.println("extract -  Extracting encryptedPlainText.length : " +(encryptedPlainText.length)+" hasta "+(encryptedPlainText.length+127));
+
+        System.out.println("extract -  Extracting sourceBytes.length-128 : " +(sourceBytes.length-128)+" hasta "+sourceBytes.length );
+        byte [] signature = Arrays.copyOfRange(sourceBytes, sourceBytes.length-128, sourceBytes.length);
+        System.out.println("extract -  Extracting signature .lenght : " + signature.length);
+
+        byte [] sessionKeyEncripted= Arrays.copyOfRange(sourceBytes,encryptedPlainText.length, encryptedPlainText.length+127);
+        System.out.println("extract -  Extracting sessionKeyEncripted .lenght : " + sessionKeyEncripted.length);
+
+        // byte [] sesssion_key = pair.getPublic().getEncoded().length;
+        extracted [0]= encryptedPlainText;
+        extracted [1]= sessionKeyEncripted;
+        extracted [2]= signature;
+
+        return extracted;
+    }
+
+    public PrivateKey getPrivateKeyDECRIPTED (String path) {
+        String pathSalida = path;
+        PrivateKey privateKeyDEC=null;
+        try{
+            System.out.println("getPrivateKeyDECRIPTED - Desencriptamos la privateKey  : ");
+
+            byte[] privKeyDEncript = decriptPrivateKey(rsaLibrary.PRIVATE_KEY_FILE, giveMePassphrase(), pathSalida);
+            //System.out.println("SimpleSec - Que vale salidaDECPrivKey : " + arrayByteToString(privKeyDEncript));
+
+            KeyFactory keyFactory = KeyFactory.getInstance(rsaLibrary.ALGORITHM);
+            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privKeyDEncript);
+            privateKeyDEC = keyFactory.generatePrivate(privateKeySpec);
+
+            // Luego la escribo en un fichero por si acaso
+            FileOutputStream privateFileAfterDEC = new FileOutputStream(pathSalida);
+            privateFileAfterDEC.write(privKeyDEncript);
+        }catch(Exception e){ e.printStackTrace();}
+
+        return privateKeyDEC;
+
+    }
+
+    public void getDECText( String fileENCRIPTED,String destinationFileDECRIPTED,KeyPair pair){
+        //byte [][] extracted = extract(fileENCRIPTED);
+        //System.out.println("getDECText-  extracted.length = "+extracted.length);
+
+        byte [] sourceBytes=null;
+        Path fileENCRIPTEDPath= Paths.get(fileENCRIPTED);
+        try {
+            sourceBytes = Files.readAllBytes(fileENCRIPTEDPath);
+        }catch (Exception e) { e.printStackTrace();}
+
+        System.out.println("extract -  publicKey.lenght : " + pair.getPublic().getEncoded().length);
+        System.out.println("extract -  sourceBytes of fileENCRIPTED.lenght : " + sourceBytes.length);
+
+        System.out.println("extract -  Indice que se va ahora  desde 0 hasta : " + (sourceBytes.length-128-128));
+
+        /**byte [] encryptedPlainText= Arrays.copyOfRange(sourceBytes,0, sourceBytes.length-128-128); //Suponemos firma y ENCsessionKey+publicKey.length =128each
+        System.out.println("extract -  Extracting encryptedPlainText .lenght : " + encryptedPlainText.length);
+        System.out.println("extract -  Extracting encryptedPlainText.length : " +(encryptedPlainText.length)+" hasta "+(encryptedPlainText.length+127));
+*/
+        System.out.println("extract -  Extracting sourceBytes.length-128 : " +(sourceBytes.length-128)+" hasta "+sourceBytes.length );
+        byte [] signature = Arrays.copyOfRange(sourceBytes, sourceBytes.length-128, sourceBytes.length);
+        System.out.println("extract -  Extracting signature .lenght : " + signature.length);
+/**
+        byte [] sessionKeyEncripted= Arrays.copyOfRange(sourceBytes,encryptedPlainText.length, encryptedPlainText.length+127);
+        System.out.println("extract -  Extracting sessionKeyEncripted .lenght : " + sessionKeyEncripted.length);
+*/
+        byte [] fileSigned = Arrays.copyOfRange(sourceBytes,0, sourceBytes.length-128);
+
+
+        System.out.println("getDECText-  Verificamos firma : ");
+        //    public boolean verify(byte[] plaintext, byte[] signed, PublicKey key) {
+        // Verificamos Firma
+
+         boolean is_OK= rsaLibrary.verify(fileSigned,signature,pair.getPublic());
+         System.out.println("Firma correcta ?? :  "+is_OK);
+
+
+        // Obtenemos PrivateKey necesaria para obtener todo lo demas
+      //  System.out.println("getDECText-  Saco de nuevo privateKey");
+         //PrivateKey privateKey = getPrivateKeyDECRIPTED();
+   /**     PrivateKey privateKeyDEC=null;
+        try {
+*/
+            /**  Meter en funcion */
+   /**         System.out.println("getDECText - Desencriptamos la privateKey para ver si queda igual : ");
+            String pathSalida = "./privateKeyDECRIPTED3.key";
+            byte[] privKeyDEncript = decriptPrivateKey(rsaLibrary.PRIVATE_KEY_FILE, giveMePassphrase(), pathSalida);
+            System.out.println("getDECText - Que vale salidaDECPrivKey : " + arrayByteToString(privKeyDEncript));
+
+            KeyFactory keyFactory = KeyFactory.getInstance(rsaLibrary.ALGORITHM);
+            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privKeyDEncript);
+            privateKeyDEC = keyFactory.generatePrivate(privateKeySpec);
+
+            // Luego la escribo en un fichero por si acaso
+            FileOutputStream privateFileAfterDEC = new FileOutputStream(pathSalida);
+            privateFileAfterDEC.write(privKeyDEncript);
+            /** hasta aqui meter en funcion*/
+
+            //}catch(Exception e){e.printStackTrace();}
+
+
+        //Decrypting the SessionKey DES Pract2
+        //        public byte[] decrypt(byte[] ciphertext, PrivateKey key) {
+  /**      System.out.println("getDECText - encript [2] para sacar SessionKey= "+arrayByteToString(extracted[2]));
+        byte [] sessionKey = rsaLibrary.decrypt(extracted[2],privateKeyDEC);
+
+        System.out.println(" desecnriptada sessionKey : " +sessionKey.length);
+        System.out.println(" desecnriptada sessionKey bytes : " +arrayByteToString(sessionKey));
+*/
+
+
+
 
     }
     /*************************************************************************************/

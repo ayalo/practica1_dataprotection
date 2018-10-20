@@ -79,7 +79,7 @@ public class SymmetricCipher {
     /* Method to decrypt using AES/CBC/PKCS5 */
     /* @ iniEC */
     /* @ xor */
-    /* @ decriptBlock */
+    /* @ decryptBlock */
     /* @ unPadding */
     /*************************************************************************************/
 

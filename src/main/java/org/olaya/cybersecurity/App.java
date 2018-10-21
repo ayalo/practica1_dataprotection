@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class App
 {
 /** PRACTICA 3*/
+
  public static void main( String[] args ) throws Exception {
      // capturar la excepción y manejar que no se quede vacia ni sean mas de 16bytes.
 
@@ -25,18 +26,19 @@ public class App
      String sourceFile=null;
      String destinationFile=null;
 
-     if (args.length ==3) {
+     if (args.length ==3 || (args.length==1 && args[0].equals("g"))) {
          try {
              mode = (String) args[0];
-             sourceFile = (String) args[1];
-             destinationFile = (String) args[2];
+             if (!args[0].equals("g")) {
+                 sourceFile = (String) args[1];
+                 destinationFile = (String) args[2];
+             }
          } catch (Exception e) {
              System.err.println("Arguments must be an String.");
              System.exit(1);
          }
-     }else {
+     }else  {
          System.err.println("You must enter the correct arguments  ");
-         System.out.println("Primer else ");
          System.exit(1);
      }
 
@@ -48,15 +50,20 @@ public class App
      SimpleSec simpleSec = new SimpleSec();
      if (mode.equals("g") || mode.equals("e") || mode.equals("d")) {
          System.out.println("Main -------------------------------------------------------------------- ");
-         //simpleSec.call("g", "text.txt", "SALIDA.txt");
          simpleSec.call(mode, sourceFile, destinationFile);
          System.out.println("------------------------------------------------------------------------- ");
      }else {
          System.err.println("Arguments are invalid. ");
          System.out.println("You must enter the correct arguments : ");
          System.out.println ("To execute the jar file like this example: ");
+         System.out.println ("To Generate KeyPair:   ");
+         System.out.println("java -cp target/practica3_dataprotection-1.0-SNAPSHOT.jar org.olaya.cybersecurity.App g ");
          System.out.println ("   ");
-         System.out.println("java -cp practica3_dataprotection-1.0-SNAPSHOT.jar org.olaya.cybersecurity.App g textSource.txt outputText.txt");
+         System.out.println ("To Encrypt:    ");
+         System.out.println("java -cp target/practica3_dataprotection-1.0-SNAPSHOT.jar org.olaya.cybersecurity.App e textSourceToEncrypt.txt outputFileEncrypted.txt");
+         System.out.println ("   ");
+         System.out.println ("To Decrypt:   ");
+         System.out.println("java -cp target/practica3_dataprotection-1.0-SNAPSHOT.jar org.olaya.cybersecurity.App d FileEncrypted.txt outputTextDecrypted.txt");
          System.out.println ("   ");
          System.out.println(" Write  arguments: mode sourceFile destinationFile");
          System.out.println(" mode could be : ");
@@ -72,8 +79,8 @@ public class App
 
 
 }
+/*
 
-/**
  public static void main( String[] args ) throws Exception {
      // capturar la excepción y manejar que no se quede vacia ni sean mas de 16bytes.
 
@@ -92,6 +99,7 @@ public class App
      simpleSec.call("d","ficheroSALIDA.txt","textDECRIPTED.txt");
 
 
- }*/
+ }
+ */
 
 }
